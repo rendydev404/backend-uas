@@ -7,8 +7,13 @@ const path = require('path');
 const apiRoutes = require('./routes');
 const initDb = require('./config/initDb');
 
+const { UPLOAD_DIR } = require('./middleware/upload');
+
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Diperlukan agar req.protocol terbaca benar (https) di belakang proxy Railway
+app.set('trust proxy', 1);
 
 // ---- CORS ----
 const corsOrigins = (process.env.CORS_ORIGIN || '')
@@ -24,6 +29,7 @@ app.use(
 
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
+app.use('/uploads', express.static(UPLOAD_DIR));
 
 // ---- Health & root ----
 app.get('/', (req, res) => {
@@ -75,6 +81,9 @@ app.use((req, res) => {
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   console.error('[error]', err);
+  if (err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(400).json({ success: false, message: 'Ukuran gambar maksimal 5MB' });
+  }
   res.status(err.status || 500).json({
     success: false,
     message: err.message || 'Terjadi kesalahan pada server',

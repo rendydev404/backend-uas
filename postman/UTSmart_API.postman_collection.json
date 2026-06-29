@@ -98,6 +98,18 @@
           }
         },
         {
+          "name": "Upload Image (admin)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/upload", "host": ["{{baseUrl}}"], "path": ["api", "upload"] },
+            "body": {
+              "mode": "formdata",
+              "formdata": [{ "key": "image", "type": "file", "src": [] }]
+            }
+          }
+        },
+        {
           "name": "Create Product (admin)",
           "event": [
             {

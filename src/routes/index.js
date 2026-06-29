@@ -2,10 +2,12 @@ const express = require('express');
 const router = express.Router();
 
 const { authRequired, adminOnly } = require('../middleware/auth');
+const { upload } = require('../middleware/upload');
 const authController = require('../controllers/authController');
 const productController = require('../controllers/productController');
 const orderController = require('../controllers/orderController');
 const adminController = require('../controllers/adminController');
+const uploadController = require('../controllers/uploadController');
 
 // ---- Auth ----
 router.post('/auth/register', authController.register);
@@ -25,6 +27,9 @@ router.post('/checkout', authRequired, orderController.checkout);
 router.get('/orders', authRequired, orderController.getAll);
 router.get('/orders/:id', authRequired, orderController.getById);
 router.put('/orders/:id/status', authRequired, adminOnly, orderController.updateStatus);
+
+// ---- Upload ----
+router.post('/upload', authRequired, adminOnly, upload.single('image'), uploadController.uploadImage);
 
 // ---- Admin ----
 router.get('/admin/stats', authRequired, adminOnly, adminController.stats);
