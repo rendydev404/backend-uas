@@ -29,5 +29,8 @@ router.put('/orders/:id/status', authRequired, adminOnly, orderController.update
 // ---- Admin ----
 router.get('/admin/stats', authRequired, adminOnly, adminController.stats);
 router.get('/admin/users', authRequired, adminOnly, adminController.listUsers);
+router.post('/admin/users', authRequired, adminOnly, adminController.createUser);
+router.put('/admin/users/:id', authRequired, adminOnly, adminController.updateUser);
+router.delete('/admin/users/:id', authRequired, adminOnly, adminController.deleteUser);
 
 module.exports = router;

@@ -49,6 +49,8 @@ async function login(req, res, next) {
       return res.status(401).json({ success: false, message: 'Email atau password salah' });
     }
 
+    await pool.query('UPDATE users SET last_seen = NOW() WHERE id = ?', [dbUser.id]);
+
     const user = { id: dbUser.id, name: dbUser.name, email: dbUser.email, role: dbUser.role };
     const token = signToken(user);
     return res.json({

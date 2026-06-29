@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const pool = require('../config/db');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'utsmart_dev_secret';
 
@@ -22,6 +23,8 @@ function authRequired(req, res, next) {
 
   try {
     req.user = jwt.verify(token, JWT_SECRET);
+    // Tandai user sebagai "online" (best-effort, tidak menunggu/blocking request)
+    pool.query('UPDATE users SET last_seen = NOW() WHERE id = ?', [req.user.id]).catch(() => {});
     next();
   } catch (err) {
     return res.status(401).json({ success: false, message: 'Token tidak valid atau kadaluarsa' });

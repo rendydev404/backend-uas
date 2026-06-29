@@ -10,6 +10,7 @@ const pool = require('./db');
  */
 async function initDb() {
   await createTables();
+  await migrateUsersTable();
   await seedAdmin();
   await seedProducts();
 }
@@ -22,6 +23,7 @@ async function createTables() {
       email        VARCHAR(160) NOT NULL UNIQUE,
       password     VARCHAR(200) NOT NULL,
       role         ENUM('user','admin') NOT NULL DEFAULT 'user',
+      last_seen    DATETIME NULL,
       created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
   `);
@@ -76,6 +78,18 @@ async function createTables() {
         REFERENCES orders(id) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
   `);
+}
+
+/** Menambah kolom last_seen ke tabel users yang sudah ada sebelumnya (migrasi aman). */
+async function migrateUsersTable() {
+  const [cols] = await pool.query(
+    `SELECT COUNT(*) AS count FROM information_schema.columns
+     WHERE table_schema = DATABASE() AND table_name = 'users' AND column_name = 'last_seen'`
+  );
+  if (cols[0].count > 0) return;
+
+  await pool.query('ALTER TABLE users ADD COLUMN last_seen DATETIME NULL');
+  console.log('[migrate] Kolom last_seen ditambahkan ke tabel users');
 }
 
 async function seedAdmin() {
