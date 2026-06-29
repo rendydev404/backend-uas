@@ -9,13 +9,14 @@ Dibangun dengan **Node.js + Express + MySQL**, lengkap dengan **CRUD Produk**, *
 - 🔐 **Auth**: register, login (user & admin), JWT, password di-hash (bcrypt)
 - 📦 **Produk**: CRUD penuh + search, filter kategori, sorting
 - 🛒 **Checkout**: validasi stok, hitung total server-side, kurangi stok (transaksi MySQL)
-- 📲 **Notif WhatsApp**: setiap orderan masuk otomatis dikirim ke WA owner (Fonnte API)
+- 📲 **Forward ke WhatsApp**: checkout mengembalikan link `wa.me` berisi detail pesanan
+  (dinamis) agar customer langsung chat konfirmasi ke WA owner
 - 📊 **Admin**: statistik dashboard, kelola pesanan & status, daftar user
 - 🌱 **Auto-seed**: tabel & data awal (admin + 24 produk) dibuat otomatis saat start
 
 ## 🧱 Tech Stack
 
-Express • mysql2 • jsonwebtoken • bcryptjs • axios (Fonnte) • cors • dotenv
+Express • mysql2 • jsonwebtoken • bcryptjs • cors • dotenv
 
 ## 📁 Struktur
 
@@ -57,16 +58,16 @@ postman/UTSmart_API.postman_collection.json
 |-------|----------------------|------------|
 | Admin | admin@utsmart.com    | admin123   |
 
-## 📲 Konfigurasi Notifikasi WhatsApp (Fonnte)
+## 📲 Forward Pesanan ke WhatsApp (wa.me)
 
-1. Daftar di [fonnte.com](https://fonnte.com), sambungkan device WhatsApp, salin **token**.
-2. Isi di `.env`:
+1. Isi nomor WA owner di `.env`:
    ```
-   FONNTE_TOKEN=xxxxxxxxxxxx
-   OWNER_WA_NUMBER=6281234567890   # nomor owner, format 62xxx tanpa +
+   OWNER_WA_NUMBER=6281234567890   # format 62xxx tanpa +
    ```
-3. Setiap `POST /api/checkout` berhasil, owner menerima notif orderan di WhatsApp.
-   > Jika token belum di-set, checkout tetap sukses dan preview pesan dicetak di log server.
+2. Setiap `POST /api/checkout` berhasil, respons berisi `whatsappUrl`, yaitu link
+   `https://wa.me/<owner>?text=<detail-pesanan>`. Frontend membuka link ini sehingga
+   customer langsung chat konfirmasi pesanan ke owner dengan pesan yang sudah terisi.
+   > Jika `OWNER_WA_NUMBER` belum di-set, `whatsappUrl` bernilai `null` (checkout tetap sukses).
 
 ## 📚 Daftar Endpoint
 

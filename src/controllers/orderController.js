@@ -1,6 +1,6 @@
 const pool = require('../config/db');
 const { serializeOrder } = require('../utils/serialize');
-const { sendOrderNotification } = require('../utils/fonnte');
+const { buildWhatsappUrl } = require('../utils/whatsapp');
 
 /** Membuat ID transaksi: TRX-YYYYMMDD-XXXXX */
 function generateTransactionId() {
@@ -107,14 +107,15 @@ async function checkout(req, res, next) {
       items: lineItems,
     };
 
-    // Kirim notif WA owner (tidak memblokir keberhasilan order)
-    const notif = await sendOrderNotification(orderForNotif);
+    // Buat link click-to-chat WhatsApp ke owner berisi detail pesanan
+    const wa = buildWhatsappUrl(orderForNotif);
 
     return res.status(201).json({
       success: true,
       message: 'Order berhasil dibuat',
       orderId,
-      whatsappNotification: notif,
+      whatsappUrl: wa.url,
+      whatsappMessage: wa.message,
       data: serializeOrder(
         { ...orderForNotif, user_id: userId },
         lineItems

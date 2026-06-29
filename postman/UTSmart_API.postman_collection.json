@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "UTSmart API - Tugas UAS",
-    "description": "Koleksi endpoint backend online store UTSmart (Auth, Produk CRUD, Checkout + notif WhatsApp, Orders, Admin).\n\nVariabel collection:\n- baseUrl : URL API (default http://localhost:5000). Ganti ke URL Railway saat deploy.\n- token   : otomatis terisi setelah Login (lihat tab Tests pada request Login).\n\nLogin admin default: admin@utsmart.com / admin123",
+    "description": "Koleksi endpoint backend online store UTSmart (Auth, Produk CRUD, Checkout + forward order ke WhatsApp via wa.me, Orders, Admin).\n\nVariabel collection:\n- baseUrl : URL API (default http://localhost:5000). Ganti ke URL Railway saat deploy.\n- token   : otomatis terisi setelah Login (lihat tab Tests pada request Login).\n\nLogin admin default: admin@utsmart.com / admin123",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [

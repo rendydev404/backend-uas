@@ -1,7 +1,7 @@
 {
   "name": "utsmart-backend",
   "version": "1.0.0",
-  "description": "Backend API untuk online store UTSmart (CRUD produk, auth, checkout + notifikasi WhatsApp via Fonnte). Tugas UAS.",
+  "description": "Backend API untuk online store UTSmart (CRUD produk, auth, checkout + forward order ke WhatsApp owner via wa.me). Tugas UAS.",
   "main": "src/server.js",
   "type": "commonjs",
   "scripts": {
@@ -23,7 +23,6 @@
   "author": "Rendi Irawan",
   "license": "MIT",
   "dependencies": {
-    "axios": "^1.7.7",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
