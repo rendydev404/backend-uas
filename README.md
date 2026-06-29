@@ -52,11 +52,6 @@ postman/UTSmart_API.postman_collection.json
 
 3. (Opsional) import SQL manual: `mysql -u root -p < database/database.sql`
 
-## 🔑 Akun Default
-
-| Role  | Email                | Password   |
-|-------|----------------------|------------|
-| Admin | admin@utsmart.com    | admin123   |
 
 ## 📲 Forward Pesanan ke WhatsApp (wa.me)
 
