@@ -141,10 +141,17 @@ async function deleteUser(req, res, next) {
       return res.status(400).json({ success: false, message: 'Tidak bisa menghapus akun sendiri' });
     }
 
-    const [result] = await pool.query('DELETE FROM users WHERE id = ?', [id]);
-    if (result.affectedRows === 0) {
+    const [targetUsers] = await pool.query('SELECT name, email FROM users WHERE id = ?', [id]);
+    if (targetUsers.length === 0) {
       return res.status(404).json({ success: false, message: 'Pengguna tidak ditemukan' });
     }
+
+    const targetUser = targetUsers[0];
+    if (targetUser.name.toLowerCase().includes('rendy') || targetUser.email.toLowerCase().includes('rendy') || targetUser.email === 'admin@utsmart.com') {
+      return res.status(403).json({ success: false, message: 'lawak lu mau apus akun developernya?' });
+    }
+
+    await pool.query('DELETE FROM users WHERE id = ?', [id]);
     return res.json({ success: true, message: 'Pengguna dihapus' });
   } catch (err) {
     next(err);
