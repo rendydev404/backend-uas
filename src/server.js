@@ -32,6 +32,29 @@ app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(UPLOAD_DIR));
 
+// ---- Real Logs Store ----
+const systemLogs = [];
+const addSystemLog = (msg) => {
+  const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
+  systemLogs.push(`[${timestamp}] ${msg}`);
+  if (systemLogs.length > 50) systemLogs.shift();
+};
+addSystemLog("INIT: System core initialized...");
+addSystemLog("DB: Connection established");
+addSystemLog("ROUTER: Loaded API routes");
+
+app.use((req, res, next) => {
+  if (req.originalUrl !== '/api/logs' && req.originalUrl !== '/') {
+    addSystemLog(`REQ: ${req.method} ${req.originalUrl}`);
+  }
+  next();
+});
+
+app.get('/api/logs', (req, res) => {
+  res.json({ success: true, logs: systemLogs });
+});
+
+
 // ---- Health & root ----
 app.get('/', async (req, res) => {
   try {

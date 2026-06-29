@@ -332,41 +332,35 @@
         setInterval(updateUptime, 1000);
         updateUptime();
 
-        // Terminal fake logs
+        // Terminal real logs
         const terminal = document.getElementById('terminal');
-        const logs = [
-            "INIT: System core initialized...",
-            "DB: Connection established with master-node",
-            "ROUTER: Loaded 24 API routes",
-            "AUTH: JWT Middleware ready",
-            "WORKER: Background tasks running",
-            "REQ: GET /health - 200 OK",
-            "REQ: POST /api/auth/login - 200 OK",
-            "SYS: Memory usage optimal (45MB)",
-            "SYNC: Redis cache synced",
-            "REQ: GET /api/products - 200 OK",
-            "FIREWALL: Active & listening",
-            "WS: Connection client_1832 established"
-        ];
-
-        function addLog() {
-            const line = document.createElement('div');
-            line.className = 'log-line';
-            const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
-            const randomLog = logs[Math.floor(Math.random() * logs.length)];
-            line.innerHTML = `<span style="color: #8b949e">[${timestamp}]</span> ${randomLog}`;
-            
-            terminal.appendChild(line);
-            
-            if (terminal.children.length > 8) {
-                terminal.removeChild(terminal.firstChild);
+        
+        async function fetchLogs() {
+            try {
+                const response = await fetch('/api/logs');
+                const data = await response.json();
+                if (data.success && data.logs) {
+                    terminal.innerHTML = '';
+                    const logsToShow = data.logs.slice(-8);
+                    logsToShow.forEach(logText => {
+                        const line = document.createElement('div');
+                        line.className = 'log-line';
+                        const match = logText.match(/^\[(.*?)\] (.*)$/);
+                        if (match) {
+                            line.innerHTML = `<span style="color: #8b949e">[${match[1]}]</span> ${match[2]}`;
+                        } else {
+                            line.textContent = logText;
+                        }
+                        terminal.appendChild(line);
+                    });
+                }
+            } catch (err) {
+                console.error("Failed to fetch logs:", err);
             }
-            
-            // Random next log between 800ms and 3000ms
-            setTimeout(addLog, 800 + Math.random() * 2200);
         }
 
-        setTimeout(addLog, 1000);
+        setInterval(fetchLogs, 2000);
+        fetchLogs();
     </script>
 </body>
 </html>
