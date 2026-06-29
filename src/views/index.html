@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UTSmart API - System Status</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #0d1117;
+            color: #c9d1d9;
+            font-family: 'JetBrains Mono', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Grid Background */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 200vw;
+            height: 200vh;
+            background-image: 
+                linear-gradient(rgba(48, 54, 61, 0.3) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(48, 54, 61, 0.3) 1px, transparent 1px);
+            background-size: 40px 40px;
+            transform: translate(-50vw, -50vh) perspective(500px) rotateX(60deg) scale(2);
+            z-index: 0;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(-50vw, -50vh) perspective(500px) rotateX(60deg) scale(2) translateY(0); }
+            100% { transform: translate(-50vw, -50vh) perspective(500px) rotateX(60deg) scale(2) translateY(40px); }
+        }
+
+        .container {
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+            background: rgba(13, 17, 23, 0.85);
+            padding: 3rem;
+            border-radius: 16px;
+            border: 1px solid #30363d;
+            box-shadow: 0 0 40px rgba(46, 160, 67, 0.1);
+            backdrop-filter: blur(10px);
+            max-width: 90%;
+            width: 450px;
+        }
+
+        .header {
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #58a6ff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 10px rgba(88, 166, 255, 0.5);
+        }
+
+        .subtitle {
+            font-size: 0.95rem;
+            color: #8b949e;
+        }
+
+        /* Radar/Signal Animation */
+        .radar-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .core {
+            width: 16px;
+            height: 16px;
+            background-color: #3fb950;
+            border-radius: 50%;
+            box-shadow: 0 0 15px #3fb950;
+            z-index: 2;
+        }
+
+        .ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid #3fb950;
+            opacity: 0;
+            animation: pulse 2.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+
+        .ring:nth-child(2) {
+            animation-delay: 0.8s;
+        }
+
+        .ring:nth-child(3) {
+            animation-delay: 1.6s;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(0.1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        /* Status Details */
+        .status-box {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 1.2rem;
+            background: #161b22;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .status-item:hover {
+            border-color: #58a6ff;
+            box-shadow: 0 0 15px rgba(88, 166, 255, 0.2);
+        }
+
+        .label {
+            color: #8b949e;
+        }
+
+        .value {
+            color: #c9d1d9;
+            font-weight: 700;
+        }
+
+        .online {
+            color: #3fb950;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .online::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: #3fb950;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #3fb950;
+            animation: blink 1.5s infinite alternate;
+        }
+
+        @keyframes blink {
+            from { opacity: 0.5; box-shadow: 0 0 2px #3fb950; }
+            to { opacity: 1; box-shadow: 0 0 10px #3fb950; }
+        }
+
+        .links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+            width: 100%;
+        }
+
+        a {
+            flex: 1;
+            color: #58a6ff;
+            text-decoration: none;
+            padding: 0.8rem;
+            border: 1px solid #30363d;
+            background: #161b22;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        a:hover {
+            background-color: rgba(88, 166, 255, 0.1);
+            border-color: #58a6ff;
+            box-shadow: 0 0 10px rgba(88, 166, 255, 0.3);
+        }
+
+        /* Terminal effect */
+        .terminal {
+            width: 100%;
+            height: 100px;
+            background: #010409;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 1rem;
+            font-size: 0.75rem;
+            color: #3fb950;
+            overflow-y: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            position: relative;
+        }
+
+        .terminal::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(transparent 50%, rgba(1, 4, 9, 0.8) 100%);
+            pointer-events: none;
+        }
+
+        .log-line {
+            opacity: 0.8;
+            margin-bottom: 0.3rem;
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 0.8; transform: translateY(0); }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="radar-container">
+            <div class="ring"></div>
+            <div class="ring"></div>
+            <div class="ring"></div>
+            <div class="core"></div>
+        </div>
+
+        <div class="header">
+            <h1>UTSmart API</h1>
+            <div class="subtitle">System Backend Gateway</div>
+        </div>
+
+        <div class="status-box">
+            <div class="status-item">
+                <span class="label">SYSTEM STATUS</span>
+                <span class="value online">ONLINE</span>
+            </div>
+            <div class="status-item">
+                <span class="label">API VERSION</span>
+                <span class="value">v1.0.0</span>
+            </div>
+            <div class="status-item">
+                <span class="label">UPTIME</span>
+                <span class="value" id="uptime">0h 0m 0s</span>
+            </div>
+        </div>
+
+        <div class="terminal" id="terminal">
+            <!-- Logs will be injected here -->
+        </div>
+
+        <div class="links">
+            <a href="/api">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M2 2.5A2.5 2.5 0 014.5 0h8.75a.75.75 0 01.75.75v12.5a.75.75 0 01-.75.75h-2.5a.75.75 0 110-1.5h1.75v-2h-8a1 1 0 00-.714 1.7.75.75 0 01-1.072 1.05A2.495 2.495 0 012 11.5v-9zm10.5-1V9h-8c-.356 0-.694.074-1 .208V2.5a1 1 0 011-1h8zM5 12.25v3.25a.25.25 0 00.4.2l1.45-1.087a.25.25 0 01.3 0L8.6 15.7a.25.25 0 00.4-.2v-3.25a.25.25 0 00-.25-.25h-3.5a.25.25 0 00-.25.25z"></path></svg>
+                API Docs
+            </a>
+            <a href="/health">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M1.5 8a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0zM8 0a8 8 0 100 16A8 8 0 008 0zm.75 4.75a.75.75 0 00-1.5 0v2.5h-2.5a.75.75 0 000 1.5h2.5v2.5a.75.75 0 001.5 0v-2.5h2.5a.75.75 0 000-1.5h-2.5v-2.5z"></path></svg>
+                Health Check
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Server start time from template literal (fallback to fake if not provided)
+        const serverUptimeMs = parseInt('__UPTIME_MS__', 10);
+        let startTime = Date.now() - (isNaN(serverUptimeMs) ? (Math.random() * 100000000) : serverUptimeMs);
+        
+        function updateUptime() {
+            const now = Date.now();
+            const diff = now - startTime;
+            
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            let uptimeStr = '';
+            if (days > 0) uptimeStr += `${days}d `;
+            uptimeStr += `${hours}h ${minutes}m ${seconds}s`;
+            
+            document.getElementById('uptime').textContent = uptimeStr;
+        }
+        
+        setInterval(updateUptime, 1000);
+        updateUptime();
+
+        // Terminal fake logs
+        const terminal = document.getElementById('terminal');
+        const logs = [
+            "INIT: System core initialized...",
+            "DB: Connection established with master-node",
+            "ROUTER: Loaded 24 API routes",
+            "AUTH: JWT Middleware ready",
+            "WORKER: Background tasks running",
+            "REQ: GET /health - 200 OK",
+            "REQ: POST /api/auth/login - 200 OK",
+            "SYS: Memory usage optimal (45MB)",
+            "SYNC: Redis cache synced",
+            "REQ: GET /api/products - 200 OK",
+            "FIREWALL: Active & listening",
+            "WS: Connection client_1832 established"
+        ];
+
+        function addLog() {
+            const line = document.createElement('div');
+            line.className = 'log-line';
+            const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
+            const randomLog = logs[Math.floor(Math.random() * logs.length)];
+            line.innerHTML = `<span style="color: #8b949e">[${timestamp}]</span> ${randomLog}`;
+            
+            terminal.appendChild(line);
+            
+            if (terminal.children.length > 5) {
+                terminal.removeChild(terminal.firstChild);
+            }
+            
+            // Random next log between 800ms and 3000ms
+            setTimeout(addLog, 800 + Math.random() * 2200);
+        }
+
+        setTimeout(addLog, 1000);
+    </script>
+</body>
+</html>

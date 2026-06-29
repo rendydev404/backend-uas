@@ -3,6 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 
 const apiRoutes = require('./routes');
 const initDb = require('./config/initDb');
@@ -32,13 +33,20 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(UPLOAD_DIR));
 
 // ---- Health & root ----
-app.get('/', (req, res) => {
-  res.json({
-    name: 'UTSmart API',
-    status: 'online',
-    docs: '/api',
-    health: '/health',
-  });
+app.get('/', async (req, res) => {
+  try {
+    const htmlPath = path.join(__dirname, 'views', 'index.html');
+    let html = await fs.promises.readFile(htmlPath, 'utf8');
+    html = html.replace('__UPTIME_MS__', Math.floor(process.uptime() * 1000).toString());
+    res.send(html);
+  } catch (err) {
+    res.json({
+      name: 'UTSmart API',
+      status: 'online',
+      docs: '/api',
+      health: '/health',
+    });
+  }
 });
 
 app.get('/health', (req, res) => res.json({ success: true, status: 'healthy', uptime: process.uptime() }));
