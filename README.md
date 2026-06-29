@@ -1,3 +1,7 @@
+# FrontEnd Repo
+https://github.com/rendydev404/Rendi_Irawan_UTS_WEB2
+
+
 # UTSmart Backend API — Tugas UAS
 
 Backend REST API untuk online store **UTSmart** (lanjutan dari project frontend UTS).
